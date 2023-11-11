@@ -1,11 +1,12 @@
 import { extendTheme } from '@chakra-ui/react';
+import backgroundImg from '../src/background.png';
 
 export const theme = extendTheme({
   styles: {
     global: {
       body: {
-        backgroundColor: 'yellow.100',
         color: 'gray.800',
+        backgroundImage: `url(${backgroundImg})`,
       },
     },
   },
