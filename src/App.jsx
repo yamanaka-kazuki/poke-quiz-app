@@ -1,14 +1,16 @@
 import './App.css';
-import { ChakraProvider, Heading } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { PokeCard } from './components/organisms/PokeCard';
 
 import { theme } from './Theme';
+import { Header } from './components/organisms/Header';
+import './style.css';
 
 export default function App() {
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
-        <Heading mt="24">ポケモンシルエットクイズ</Heading>
+        <Header />
         <PokeCard />
       </div>
     </ChakraProvider>
