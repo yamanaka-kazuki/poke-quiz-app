@@ -25,7 +25,6 @@ export const PokeCard = () => {
         const response = await axios.get(
           `https://pokeapi.co/api/v2/pokemon/${randomNum}`
         );
-        console.log(response.data);
         setImgUrl(
           response.data.sprites.other['official-artwork'].front_default
         );
