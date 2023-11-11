@@ -16,6 +16,7 @@ import axios from 'axios';
 export const PokeCard = () => {
   const [data, setData] = useState([]);
   const [imgUrl, setImgUrl] = useState('');
+  const [jaName, setJaName] = useState('');
 
   useEffect(() => {
     const randomNum = Math.floor(Math.random() * 150 + 1);
@@ -25,6 +26,17 @@ export const PokeCard = () => {
         const response = await axios.get(
           `https://pokeapi.co/api/v2/pokemon/${randomNum}`
         );
+
+        // ポケモンの日本語名を取得
+        const pokemonNameDetail = response.data.species.url;
+        let res = await fetch(pokemonNameDetail);
+        let result = await res.json();
+        let jaName = result.names.find(
+          (name) => name.language.name === 'ja'
+        ).name;
+        setJaName(jaName);
+
+        // ポケモンの画像を取得
         setImgUrl(
           response.data.sprites.other['official-artwork'].front_default
         );
@@ -46,7 +58,7 @@ export const PokeCard = () => {
   };
 
   const judgeAnswer = () => {
-    const isCorrect = value === data.name;
+    const isCorrect = value === jaName;
     setIsCorrect(isCorrect);
     trueFalseToast(isCorrect);
   };
