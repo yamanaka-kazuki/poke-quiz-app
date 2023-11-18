@@ -10,6 +10,15 @@ import {
   Input,
   Button,
   useToast,
+  Flex,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  useDisclosure,
+  Link,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -17,12 +26,17 @@ export const PokeCard = () => {
   const [data, setData] = useState([]);
   const [imgUrl, setImgUrl] = useState('');
   const [jaName, setJaName] = useState('');
+  const [message, setMessage] = useState('このポケモンは？');
+  const [correctCount, setCorrectCount] = useState(0);
 
   const inputRef = useRef(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     // inputにレンダリング時フォーカス
+    inputRef.current.value = '';
     inputRef.current.focus();
+    setIsCorrect(false);
 
     const randomNum = Math.floor(Math.random() * 150 + 1);
 
@@ -52,7 +66,7 @@ export const PokeCard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [correctCount]);
 
   const [value, setValue] = useState('');
   const [isCorrect, setIsCorrect] = useState(false);
@@ -68,6 +82,14 @@ export const PokeCard = () => {
     trueFalseToast(isCorrect);
   };
 
+  const displayAnswer = () => {
+    document.querySelector('.chakra-image').style.filter = 'brightness(100%)';
+    setMessage(jaName);
+    setTimeout(() => {
+      onOpen();
+    }, 3000);
+  };
+
   const trueFalseToast = (isCorrect) => {
     toast({
       title: isCorrect ? '正解！！' : '不正解。。。',
@@ -77,9 +99,11 @@ export const PokeCard = () => {
     });
 
     if (isCorrect) {
+      setIsCorrect(true);
       setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+        setCorrectCount(correctCount + 1);
+      }, 2000);
+      console.log(correctCount);
     }
   };
 
@@ -102,7 +126,7 @@ export const PokeCard = () => {
                   }
                 ></Image>
                 <Heading size="md" mt="4">
-                  このポケモンは？
+                  {message}
                 </Heading>
                 <Input
                   placeholder="名前を入力"
@@ -111,14 +135,46 @@ export const PokeCard = () => {
                   onChange={handleInputChange}
                   ref={inputRef}
                 />
-                <Button
-                  colorScheme="teal"
-                  size="md"
-                  onClick={judgeAnswer}
-                  mt="4"
+                <Flex justifyContent="center" gap="8">
+                  <Button
+                    colorScheme="teal"
+                    size="md"
+                    onClick={judgeAnswer}
+                    mt="4"
+                  >
+                    わかった！
+                  </Button>
+                  <Button
+                    colorScheme="red"
+                    size="md"
+                    mt="4"
+                    onClick={displayAnswer}
+                  >
+                    わからない…
+                  </Button>
+                </Flex>
+                <Modal
+                  closeOnOverlayClick={false}
+                  isOpen={isOpen}
+                  onClose={onClose}
                 >
-                  正解を表示
-                </Button>
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalHeader>さんのスコアは・・・</ModalHeader>
+                    <ModalBody pb={6} fontSize="36" textAlign="center">
+                      {correctCount} 問でした！
+                    </ModalBody>
+
+                    <ModalFooter>
+                      <Button colorScheme="blue" mr={3}>
+                        再挑戦する！
+                      </Button>
+                      <Button>
+                        <Link href="/">TOPに戻る</Link>
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
               </Stack>
             </CardBody>
           </Card>
