@@ -5,8 +5,6 @@ import {
   Stack,
   Heading,
   Image,
-  Box,
-  AbsoluteCenter,
   Input,
   Button,
   useToast,
@@ -19,6 +17,7 @@ import {
   ModalBody,
   useDisclosure,
   Link,
+  Center,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -28,6 +27,7 @@ export const PokeCard = () => {
   const [jaName, setJaName] = useState('');
   const [message, setMessage] = useState('このポケモンは？');
   const [correctCount, setCorrectCount] = useState(0);
+  const [bookNumbers] = useState([...Array(1010)].map((_, i) => i + 1));
 
   const inputRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,14 +38,15 @@ export const PokeCard = () => {
     inputRef.current.focus();
     setIsCorrect(false);
 
-    const randomNum = Math.floor(Math.random() * 150 + 1);
+    // ランダムに選択された数値を取得
+    const randomIndex = Math.floor(Math.random() * bookNumbers.length);
+    const selectedNumber = bookNumbers[randomIndex];
 
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://pokeapi.co/api/v2/pokemon/${randomNum}`
+          `https://pokeapi.co/api/v2/pokemon/${selectedNumber}`
         );
-
         // ポケモンの日本語名を取得
         const pokemonNameDetail = response.data.species.url;
         let res = await fetch(pokemonNameDetail);
@@ -64,6 +65,11 @@ export const PokeCard = () => {
         console.error('Error fetching Data', error);
       }
     };
+
+    // ランダムに選択された数値を配列から除去
+    bookNumbers.splice(bookNumbers.indexOf(selectedNumber), 1);
+    console.log(bookNumbers.length);
+    console.log(bookNumbers.indexOf(selectedNumber));
 
     fetchData();
   }, [correctCount]);
@@ -109,77 +115,83 @@ export const PokeCard = () => {
 
   return (
     <>
-      <Box position="relative" h="600px">
-        <AbsoluteCenter>
-          <Card w="600px" boxShadow="2xl">
-            <CardBody>
-              <Stack align="center">
-                <Image
-                  src={imgUrl}
-                  borderRadius="lg"
-                  w="240"
-                  h="240"
-                  style={
-                    isCorrect
-                      ? { filter: 'brightness(100%)' }
-                      : { filter: 'brightness(0%)' }
-                  }
-                ></Image>
-                <Heading size="md" mt="4">
-                  {message}
-                </Heading>
-                <Input
-                  placeholder="名前を入力"
-                  borderRadius="lg"
-                  mt="8"
-                  onChange={handleInputChange}
-                  ref={inputRef}
-                />
-                <Flex justifyContent="center" gap="8">
-                  <Button
-                    colorScheme="teal"
-                    size="md"
-                    onClick={judgeAnswer}
-                    mt="4"
-                  >
-                    わかった！
-                  </Button>
-                  <Button
-                    colorScheme="red"
-                    size="md"
-                    mt="4"
-                    onClick={displayAnswer}
-                  >
-                    わからない…
-                  </Button>
-                </Flex>
-                <Modal
-                  closeOnOverlayClick={false}
-                  isOpen={isOpen}
-                  onClose={onClose}
+      <Center>
+        <Card
+          w={{ base: '300px', md: '480px', lg: '600px' }}
+          boxShadow="2xl"
+          mt={{ base: '4', md: '6', lg: '8' }}
+        >
+          <CardBody>
+            <Stack align="center">
+              <Image
+                src={imgUrl}
+                borderRadius="lg"
+                w={{ base: '150px', md: '180px', lg: '240px' }}
+                h={{ base: '150px', md: '180px', lg: '240px' }}
+                style={
+                  isCorrect
+                    ? { filter: 'brightness(100%)' }
+                    : { filter: 'brightness(0%)' }
+                }
+              ></Image>
+              <Heading size="md" mt="4">
+                {message}
+              </Heading>
+              <Input
+                placeholder="名前を入力"
+                borderRadius="lg"
+                mt="8"
+                onChange={handleInputChange}
+                ref={inputRef}
+              />
+              <Flex
+                justifyContent="center"
+                gap={{ base: '2', md: '4', lg: '8' }}
+                flexDirection={{ base: 'column', md: 'row', lg: 'row' }}
+              >
+                <Button
+                  colorScheme="teal"
+                  size={{ base: 'lg', md: 'md', lg: 'md' }}
+                  onClick={judgeAnswer}
+                  mt={{ base: '2', md: '2', lg: '4' }}
                 >
-                  <ModalOverlay />
-                  <ModalContent>
-                    <ModalHeader>さんのスコアは・・・</ModalHeader>
-                    <ModalBody pb={6} fontSize="36" textAlign="center">
-                      {correctCount} 問でした！
-                    </ModalBody>
+                  わかった！
+                </Button>
+                <Button
+                  colorScheme="red"
+                  size={{ base: 'lg', md: 'md', lg: 'md' }}
+                  mt={{ base: '2', md: '2', lg: '4' }}
+                  onClick={displayAnswer}
+                >
+                  わからない…
+                </Button>
+              </Flex>
+              <Modal
+                closeOnOverlayClick={false}
+                isOpen={isOpen}
+                onClose={onClose}
+              >
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>さんのスコアは・・・</ModalHeader>
+                  <ModalBody pb={6} fontSize="36" textAlign="center">
+                    {correctCount} 問でした！
+                  </ModalBody>
 
-                    <ModalFooter>
-                      <Button colorScheme="blue" mr={3}>
-                        再挑戦する！
-                      </Button>
-                      <Button>
-                        <Link href="/">TOPに戻る</Link>
-                      </Button>
-                    </ModalFooter>
-                  </ModalContent>
-                </Modal>
-              </Stack>
-            </CardBody>
-          </Card>
-        </AbsoluteCenter>
-      </Box>
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3}>
+                      再挑戦する！
+                    </Button>
+                    <Button>
+                      <Link href="/">TOPに戻る</Link>
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+            </Stack>
+          </CardBody>
+        </Card>
+      </Center>
     </>
   );
 };

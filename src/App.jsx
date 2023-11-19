@@ -1,5 +1,5 @@
 import './App.css';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Center, ChakraProvider } from '@chakra-ui/react';
 import { PokeCard } from './components/organisms/PokeCard';
 
 import { theme } from './Theme';

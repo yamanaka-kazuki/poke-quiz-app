@@ -7,6 +7,7 @@ export const theme = extendTheme({
       body: {
         color: 'gray.800',
         backgroundImage: `url(${backgroundImg})`,
+        width: '100%',
       },
     },
   },
